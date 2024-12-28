@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>YouTube Channel Analyzer</title>
+    <script>
+      async function fetchTopVideos() {
+        const youtubeUrl = document.getElementById("youtubeUrl").value
+        const response = await fetch("/get_top_videos", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ youtube_url: youtubeUrl }),
+        })
+        const result = await response.json()
+        const output = document.getElementById("output")
+        output.innerHTML = ""
+
+        if (response.ok) {
+          result.forEach((video) => {
+            output.innerHTML += `
+                        <div>
+                            <h3>${video.title}</h3>
+                            <img src="${video.thumbnail}" alt="${video.title}" width="200">
+                            <p>Views: ${video.views}</p>
+                            <p>Comments: ${video.comments}</p>
+                            <p>Likes: ${video.likes}</p>
+                            <p>Duration: ${video.duration}</p>
+                            <p>Published Date: ${video.published_date}</p>
+                            <a href="${video.url}" target="_blank">Watch Video</a>
+                        </div><hr>
+                    `
+          })
+        } else {
+          output.innerHTML = `<p style="color: red;">Error: ${result.error}</p>`
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <h1>YouTube Channel Analyzer</h1>
+    <input
+      type="text"
+      id="youtubeUrl"
+      placeholder="Enter YouTube channel URL" />
+    <button onclick="fetchTopVideos()">Analyze</button>
+    <div id="output"></div>
+  </body>
+</html>
